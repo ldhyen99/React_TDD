@@ -7,12 +7,11 @@ import { CustomerForm } from '../src/CustomerForm';
 import { fetchResponseOk, fetchResponseError, requestBodyOf } from './spyHelps';
 
 describe('customerForm', () => {
-  let render, container, form, field, labelFor, element;
+  let render, form, field, labelFor, element;
   const originalFetch = window.fetch;
   let fetchSpy;
   const form = (id) => element(`form[id="${id}"]`);
-  const labelFor = (formElement) =>
-    element(`label[for="${formElement}"]`);
+  const labelFor = (formElement) => element(`label[for="${formElement}"]`);
 
   const field = (formId, name) => form(formId).elements[name];
 
