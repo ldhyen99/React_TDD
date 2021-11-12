@@ -7,7 +7,7 @@ import { CustomerForm } from '../src/CustomerForm';
 import { fetchResponseOk, fetchResponseError, requestBodyOf } from './spyHelps';
 
 describe('customerForm', () => {
-  let render, form, field, labelFor, element;
+  let render, form, field, labelFor, element, elements;
   const originalFetch = window.fetch;
   let fetchSpy;
   const form = (id) => element(`form[id="${id}"]`);
@@ -34,7 +34,8 @@ describe('customerForm', () => {
   // });
 
   beforeEach(() => {
-    ({ render, container, form, field, labelFor, element } = createContainer());
+    ({ render, container, form, field, labelFor, element, elements } =
+      createContainer());
     fetchSpy = jest.fn(() => fetchResponseOk({}));
     window.fetch = fetchSpy;
   });
