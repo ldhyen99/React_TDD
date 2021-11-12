@@ -7,12 +7,12 @@ import { CustomerForm } from '../src/CustomerForm';
 import { fetchResponseOk, fetchResponseError, requestBodyOf } from './spyHelps';
 
 describe('customerForm', () => {
-  let render, container, form, field, labelFor;
+  let render, container, form, field, labelFor, element;
   const originalFetch = window.fetch;
   let fetchSpy;
-  const form = (id) => container.querySelector(`form[id="${id}"]`);
+  const form = (id) => element(`form[id="${id}"]`);
   const labelFor = (formElement) =>
-    container.querySelector(`label[for="${formElement}"]`);
+    element(`label[for="${formElement}"]`);
 
   const field = (formId, name) => form(formId).elements[name];
 
@@ -35,7 +35,7 @@ describe('customerForm', () => {
   // });
 
   beforeEach(() => {
-    ({ render, container, form, field, labelFor } = createContainer());
+    ({ render, container, form, field, labelFor, element } = createContainer());
     fetchSpy = jest.fn(() => fetchResponseOk({}));
     window.fetch = fetchSpy;
   });
@@ -121,7 +121,7 @@ describe('customerForm', () => {
 
   it('has a submit button', () => {
     render(<CustomerForm />);
-    const submitButton = container.querySelector('input[type="submit"]');
+    const submitButton = element('input[type="submit"]');
     expect(submitButton).not.toBeNull();
   });
 
@@ -184,7 +184,7 @@ describe('customerForm', () => {
       ReactTestUtils.Simulate.submit(form('customer'));
     });
 
-    const errorElement = container.querySelector('.error');
+    const errorElement = element('.error');
     expect(errorElement).not.toBeNull();
     expect(errorElement.textContent).toMatch('error occurred');
   });
