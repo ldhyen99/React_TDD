@@ -1,13 +1,11 @@
 import React from 'react';
-import ReactTestUtils, { act } from 'react-dom/test-utils';
-
 import { createContainer } from './domManipulators';
 import { CustomerForm } from '../src/CustomerForm';
 
 import { fetchResponseOk, fetchResponseError, requestBodyOf } from './spyHelps';
 
 describe('customerForm', () => {
-  let render, form, field, labelFor, element, elements;
+  let render, form, field, labelFor, element, submit, change, withEvent;
   const originalFetch = window.fetch;
   let fetchSpy;
   const form = (id) => element(`form[id="${id}"]`);
@@ -34,8 +32,18 @@ describe('customerForm', () => {
   // });
 
   beforeEach(() => {
-    ({ render, container, form, field, labelFor, element, elements } =
-      createContainer());
+    ({
+      render,
+      container,
+      form,
+      field,
+      labelFor,
+      element,
+      elements,
+      submit,
+      change,
+      withEvent,
+    } = createContainer());
     fetchSpy = jest.fn(() => fetchResponseOk({}));
     window.fetch = fetchSpy;
   });
@@ -85,17 +93,17 @@ describe('customerForm', () => {
   //       />
   //     );
 
-  //     await ReactTestUtils.Simulate.change(field(fieldName), {
+  //     await change(field(fieldName), {
   //       target: { value: 'value', name: fieldName },
   //     });
 
-  //     await ReactTestUtils.Simulate.submit(form('customer'));
+  //     await submit(form('customer'));
   //   });
 
   const itSubmitsExistingValue = (fieldName, value) =>
     it('saves existing value when submitted', async () => {
       render(<CustomerForm {...{ [fieldName]: value }} />);
-      ReactTestUtils.Simulate.submit(form('customer'));
+      submit(form('customer'));
 
       expect(requestBodyOf(fetchSpy)).toMatchObject({
         [fieldName]: value,
@@ -106,11 +114,9 @@ describe('customerForm', () => {
     it('saves new value when submitted', async () => {
       render(<CustomerForm {...{ [fieldName]: 'existingValue' }} />);
 
-      await ReactTestUtils.Simulate.change(field(fieldName), {
-        target: { value: 'newValue', name: fieldName },
-      });
+      await change(field(fieldName), withEvent(fieldName, 'newValue'));
 
-      await ReactTestUtils.Simulate.submit(form('customer'));
+      await submit(form('customer'));
 
       expect(requestBodyOf(fetchSpy)).toMatchObject({
         [fieldName]: value,
@@ -128,7 +134,7 @@ describe('customerForm', () => {
   it('calls fetch with the right properties when submitting data', async () => {
     render(<CustomerForm fetch={fetchSpy.fn} />);
 
-    ReactTestUtils.Simulate.submit(form('customer'));
+    submit(form('customer'));
     expect(fetchSpy).toHaveBeenCalledWith(
       '/customers',
       expect.objectContaining({
@@ -146,7 +152,7 @@ describe('customerForm', () => {
 
     render(<CustomerForm onSave={saveSpy} />);
     await act(async () => {
-      ReactTestUtils.Simulate.submit(form('customer'));
+      submit(form('customer'));
     });
 
     expect(saveSpy).toHaveBeenCalledWith(customer);
@@ -158,7 +164,7 @@ describe('customerForm', () => {
 
     render(<CustomerForm onSave={saveSpy} />);
     await act(async () => {
-      ReactTestUtils.Simulate.submit(form('customer'));
+      submit(form('customer'));
     });
     expect(saveSpy).not.toHaveBeenCalled();
   });
@@ -169,7 +175,7 @@ describe('customerForm', () => {
 
     render(<CustomerForm />);
     await act(async () => {
-      ReactTestUtils.Simulate.submit(form('customer'), {
+      submit(form('customer'), {
         preventDefault: preventDefaultSpy,
       });
     });
@@ -181,7 +187,7 @@ describe('customerForm', () => {
     fetchSpy.mockReturnValue(Promise.resolve({ ok: false }));
     render(<CustomerForm />);
     await act(async () => {
-      ReactTestUtils.Simulate.submit(form('customer'));
+      submit(form('customer'));
     });
 
     const errorElement = element('.error');
