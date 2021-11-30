@@ -4,14 +4,22 @@ import { CustomerForm } from '../src/CustomerForm';
 
 import { fetchResponseOk, fetchResponseError, requestBodyOf } from './spyHelps';
 
-describe('customerForm', () => {
-  let render, form, field, labelFor, element, submit, change, withEvent;
+describe('customerForm2', () => {
+  let render,
+    container,
+    form,
+    field,
+    labelFor,
+    element,
+    submit,
+    change,
+    withEvent;
   const originalFetch = window.fetch;
   let fetchSpy;
-  const form = (id) => element(`form[id="${id}"]`);
-  const labelFor = (formElement) => element(`label[for="${formElement}"]`);
+  // const form = (id) => element(`form[id="${id}"]`);
+  // const labelFor = (formElement) => element(`label[for="${formElement}"]`);
 
-  const field = (formId, name) => form(formId).elements[name];
+  // const field = (formId, name) => form(formId).elements[name];
 
   const expectToBeInputFieldOfTypeText = (formElement) => {
     expect(formElement).not.toBeNull();
@@ -39,7 +47,6 @@ describe('customerForm', () => {
       field,
       labelFor,
       element,
-      elements,
       submit,
       change,
       withEvent,
@@ -110,11 +117,11 @@ describe('customerForm', () => {
       });
     });
 
-  const itSubmitsNewValue = (fieldName, value) =>
+  const itSubmitsNewValue = (fieldName, name, value) =>
     it('saves new value when submitted', async () => {
       render(<CustomerForm {...{ [fieldName]: 'existingValue' }} />);
 
-      await change(field(fieldName), withEvent(fieldName, 'newValue'));
+      await change(field(fieldName, name), withEvent(fieldName, 'newValue'));
 
       await submit(form('customer'));
 
@@ -201,7 +208,7 @@ describe('customerForm', () => {
     itRenderLabel('firstName', 'First name');
     itAssignsAnIdThatMatchesTheLabelId('firstName', 'firstName');
     itSubmitsExistingValue('firstName', 'value');
-    itSubmitsNewValue('firstName', 'newValue');
+    itSubmitsNewValue('firstName', 'firstName', 'newValue');
   });
 
   describe('last name field', () => {
@@ -210,7 +217,7 @@ describe('customerForm', () => {
     itRenderLabel('lastName', 'Last name');
     itAssignsAnIdThatMatchesTheLabelId('lastName', 'lastName');
     itSubmitsExistingValue('lastName', 'value');
-    itSubmitsNewValue('lastName', 'newValue');
+    itSubmitsNewValue('lastName', 'lastName', 'newValue');
   });
 
   describe('phoneNumber field', () => {
@@ -219,6 +226,6 @@ describe('customerForm', () => {
     itRenderLabel('phoneNumber', 'Phone number');
     itAssignsAnIdThatMatchesTheLabelId('phoneNumber', 'phoneNumber');
     itSubmitsExistingValue('phoneNumber', 'value');
-    itSubmitsNewValue('phoneNumber', 'newValue');
+    itSubmitsNewValue('phoneNumber', 'lastName', 'newValue');
   });
 });

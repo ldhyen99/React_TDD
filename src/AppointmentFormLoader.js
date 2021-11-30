@@ -16,7 +16,7 @@ export const AppointmentFormLoader = () => {
     };
 
     fetchAvailableTimeSlots();
-  }, []);
+  }, [today]);
 
   return <AppointmentForm availableTimeSlots={availableTimeSlots} />;
 };

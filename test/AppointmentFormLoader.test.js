@@ -6,13 +6,13 @@ import { AppointmentFormLoader } from '../src/AppointmentFormLoader';
 import * as AppointmentFormExports from '../src/AppointmentForm';
 
 describe('AppointmentFormLoader', () => {
-  let renderAndWait, container;
+  let renderAndWait, container, render;
 
   const today = new Date();
   const availableTimeSlots = [{ startsAt: today.setHours(9, 0, 0, 0) }];
 
   beforeEach(() => {
-    ({ renderAndWait, container } = createContainer());
+    ({ renderAndWait, container, render } = createContainer());
     jest
       .spyOn(window, 'fetch')
       .mockReturnValue(fetchResponseOk(availableTimeSlots));
@@ -53,5 +53,11 @@ describe('AppointmentFormLoader', () => {
       },
       expect.anything()
     );
+  });
+
+  it('calls window.fetch just once', async () => {
+    await renderAndWait(<AppointmentFormLoader />);
+    await renderAndWait(<AppointmentFormLoader />);
+    expect(window.fetch.mock.calls.length).toBe(1);
   });
 });
