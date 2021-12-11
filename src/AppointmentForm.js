@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const AppointmentForm = ({ selectableServices, service }) => (
+export const AppointmentForm = ({ selectableServices, service, customer }) => (
   <form id="appointment">
     <select name="service" value={service} readOnly>
       <option />
