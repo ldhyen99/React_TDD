@@ -4,40 +4,28 @@ import { CustomerForm } from './CustomerForm';
 import { AppointmentFormLoader } from './AppointmentFormLoader';
 
 export const App = () => {
-  // return view === 'addCustomer' ? (
-  //   <CustomerForm onSave={transitionToAddAppointment} />
-  // ) : (
-  //   <React.Fragment>
-  //     <div className="button-bar">
-  //       <button
-  //         type="button"
-  //         id="addCustomer"
-  //         onClick={transitionToAddCustomer}
-  //       >
-  //         Add customer and appointment
-  //       </button>
-  //     </div>
-  //     <AppointmentsDayViewLoader today={today} />
-  //   </React.Fragment>
-  // );
   const [view, setView] = useState('');
   const [customer, setCustomer] = useState();
 
-  const transitionToAddCustomer = useCallback((customer) => {
+  const transitionToAddCustomer = useCallback(() => setView('addCustomer'), []);
+
+  const transitionToAddAppointment = useCallback((customer) => {
     setCustomer(customer);
-    setView('addCustomer');
+    setView('addAppointment');
   }, []);
 
-  const transitionToAddAppointment = useCallback(
-    () => setView('addAppointment'),
-    []
-  );
+  const transitionToDayView = useCallback(() => setView('dayView'), []);
 
   switch (view) {
     case 'addCustomer':
       return <CustomerForm onSave={transitionToAddAppointment} />;
     case 'addAppointment':
-      return <AppointmentFormLoader customer={customer} />;
+      return (
+        <AppointmentFormLoader
+          customer={customer}
+          onSave={transitionToDayView}
+        />
+      );
     default:
       return (
         <React.Fragment>

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { AppointmentForm } from './AppointmentForm';
 
-export const AppointmentFormLoader = props => {
+export const AppointmentFormLoader = (props) => {
   const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
-
+  
   useEffect(() => {
     const fetchAvailableTimeSlots = async () => {
       const result = await window.fetch('/availableTimeSlots', {

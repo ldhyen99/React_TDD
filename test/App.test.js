@@ -69,7 +69,7 @@ describe('App', () => {
   });
 
   it('passes the customer to the AppointmentForm', async () => {
-    const customer = { id: 123 };
+    const customer = { id: 1234 };
 
     beginAddingCustomerAndAppointment();
     saveCustomer(customer);
@@ -77,5 +77,15 @@ describe('App', () => {
     expect(elementMatching(type(AppointmentFormLoader)).props.customer).toBe(
       customer
     );
+  });
+
+  const saveAppointment = () =>
+    elementMatching(type(AppointmentFormLoader)).props.onSave();
+
+  it('renders AppointmentDayViewLoader after AppointmentForm is submitted', async () => {
+    beginAddingCustomerAndAppointment();
+    saveCustomer();
+    saveAppointment();
+    expect(elementMatching(type(AppointmentsDayViewLoader))).toBeDefined();
   });
 });

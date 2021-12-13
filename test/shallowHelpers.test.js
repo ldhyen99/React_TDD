@@ -69,8 +69,6 @@ describe('child', () => {
   });
 });
 
-const type = (typeName) => (element) => element.type === typeName;
-
 describe('elementsMatching', () => {
   let render, elementsMatching;
   beforeEach(() => {

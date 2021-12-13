@@ -4,7 +4,4 @@ import 'whatwg-fetch';
 import { AppointmentsDayView } from './Appointment';
 import { sampleAppointments } from './sampleData';
 
-ReactDOM.render(
-  <AppointmentsDayView appointments={sampleAppointments} />,
-  document.getElementById('root')
-);
+ReactDOM.render(<Appp />, document.getElementById('root'));
