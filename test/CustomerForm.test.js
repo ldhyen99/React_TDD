@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactTestUtils, { act } from 'react-dom/test-utils';
 
-import { createContainer } from './domManipulators';
+import { createContainer, withEvent } from './domManipulators';
 import { CustomerForm } from '../src/CustomerForm';
 
 describe('customerForm', () => {
-  let render, container;
+  let render, container, blur, element;
   const originalFetch = window.fetch;
   let fetchSpy;
   const form = (id) => container.querySelector(`form[id="${id}"]`);
@@ -55,7 +55,7 @@ describe('customerForm', () => {
   });
 
   beforeEach(() => {
-    ({ render, container } = createContainer());
+    ({ render, container, blur, element } = createContainer());
     fetchSpy = spy();
     window.fetch = fetchSpy.fn;
     fetchSpy.stubReturnValue(fetchResponseOk({}));
@@ -241,4 +241,82 @@ describe('customerForm', () => {
     itSubmitsExistingValue('phoneNumber', 'value');
     itSubmitsNewValue('phoneNumber', 'newValue');
   });
+
+  // it('displays error after blur when first name field is blank', () => {
+  //   render(<CustomerForm />);
+  //   blur(
+  //     field('firstName'),
+  //     withEvent('firstName', '')
+  //     );
+  //     expect(element('.error')).not.toBeNull();
+  //     expect(element('.error').textContent).toMatch(
+  //       'First name is required'       
+  //       );
+  // });
+
+  // it('displays error after blur when last name field is blank', () => {
+  //   act(() => {
+  //     render(<CustomerForm />);
+  //     blur(
+  //       field('lastName'),
+  //       withEvent('lastName', ' ')
+  //       ); 
+  //     });
+
+  //     expect(element('.error')).not.toBeNull();
+  //     expect(element('.error').textContent).toMatch(
+  //       'Last name is required'
+  //     );
+  // })
+
+  const itInvalidatesFieldWithValue = (
+    fieldName,
+    value,
+    description
+    ) => {
+      it(`displays error after blur when ${fieldName} field is
+      '${value}'`, () => {
+        render(<CustomerForm />);
+        blur(
+          field(fieldName),
+          withEvent(fieldName, value)
+      );
+      expect(element('.error')).not.toBeNull();
+      expect(element('.error').textContent).toMatch(
+        description
+      );
+     });
+    }
+
+    itInvalidatesFieldWithValue(
+      'firstName',
+      ' ',
+      'First name is required'
+    );
+    itInvalidatesFieldWithValue(
+      'lastName',
+      ' ',
+      'Last name is required'
+    );
+
+    itInvalidatesFieldWithValue(
+      'phoneNumber',
+      ' ',
+      'Phone number is required'
+    );
+
+    itInvalidatesFieldWithValue(
+      'phoneNumber',
+      'invalid',
+      'Only numbers, spaces and these symbols are allowed: ( ) + -'
+    );
+
+    it('accepts standard phone number characters when validating', () => {
+      render(<CustomerForm />);
+      blur(
+        element("[name='phoneNumber']"),
+        withEvent('phoneNumber', '0123456789+()- ')
+      );
+      expect(element('.error')).toBeNull();
+    });
 });
