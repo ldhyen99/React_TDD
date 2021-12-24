@@ -15,10 +15,10 @@ const twoCustomers = [
 ];
 
 describe('customer search', () => {
-  let renderAndWait, elements;
+  let renderAndWait, elements, clickAndWait, element;
 
   beforeEach(() => {
-    ({ renderAndWait, elements } = createContainer());
+    ({ renderAndWait, elements, clickAndWait, element } = createContainer());
     jest.spyOn(window, 'fetch').mockReturnValue(fetchResponseOk(oneCustomer));
   });
 
@@ -56,5 +56,33 @@ describe('customer search', () => {
     await renderAndWait(<CustomerSearch />);
     const rows = elements('table tbody tr');
     expect(rows[1].childNodes[0].textContent).toEqual('C');
+  });
+
+  it('has a next button', async () => {
+    await renderAndWait(<CustomerSearch />);
+    expect(element('button#next-page')).not.toBeNull();
+  });
+
+  const tenCustomers = Array.from('0123456789', (id) => ({ id }));
+  it('requests next page of data when next button is clicked', async () => {
+    window.fetch.mockReturnValue(fetchResponseOk(tenCustomers));
+    await renderAndWait(<CustomerSearch />);
+    await clickAndWait(element('button#next-page'));
+
+    expect(window.fetch).toHaveBeenLastCalledWith(
+      '/customers?after=9',
+      expect.anything()
+    );
+  });
+
+  it('displays next page of data when next button is clicked', async () => {
+    const nextCustomer = [{ id: 'next', firstName: 'Next' }];
+    window.fetch
+      .mockReturnValueOnce(fetchResponseOk(tenCustomers))
+      .mockReturnValue(fetchResponseOk(nextCustomer));
+    await renderAndWait(<CustomerSearch />);
+    await clickAndWait(element('button#next-page'));
+    expect(elements('tbody tr').length).toEqual(1);
+    expect(elements('td')[0].textContent).toEqual('Next');
   });
 });
