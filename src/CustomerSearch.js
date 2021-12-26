@@ -12,6 +12,15 @@ const SearchButtons = ({ handleNext, handlePrevious }) => (
   </div>
 );
 
+const CustomerRow = ({ customer }) => (
+  <tr>
+    <td>{customer.firstName}</td>
+    <td>{customer.lastName}</td>
+    <td>{customer.phoneNumber}</td>
+    <td />
+  </tr>
+);
+
 export const CustomerSearch = () => {
   const [customers, setCustomers] = useState([]);
   const [queryStrings, setQueryStrings] = useState([]);
@@ -33,15 +42,6 @@ export const CustomerSearch = () => {
     fetchData();
   }, [queryStrings]);
 
-  const CustomerRow = ({ customer }) => (
-    <tr>
-      <td>{customer.firstName}</td>
-      <td>{customer.lastName}</td>
-      <td>{customer.phoneNumber}</td>
-      <td />
-    </tr>
-  );
-
   const handleNext = useCallback(() => {
     const after = customers[customers.length - 1].id;
     const queryString = `?after=${after}`;
@@ -55,6 +55,7 @@ export const CustomerSearch = () => {
 
   return (
     <React.Fragment>
+      <input placeholder="Enter filter text" />
       <SearchButtons handleNext={handleNext} handlePrevious={handlePrevious} />
       <table>
         <thead>
