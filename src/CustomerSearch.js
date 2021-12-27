@@ -21,15 +21,43 @@ const CustomerRow = ({ customer }) => (
   </tr>
 );
 
+const searchParams = (after, searchTerm) => {
+  let pairs = [];
+  if (after) {
+    pairs.push(`after=${after}`);
+  }
+  if (searchTerm) {
+    pairs.push(`searchTerm=${searchTerm}`);
+  }
+  if (pairs.length > 0) {
+    return `?${pairs.join('&')}`;
+  }
+  return '';
+};
+
 export const CustomerSearch = () => {
   const [customers, setCustomers] = useState([]);
-  const [queryStrings, setQueryStrings] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [lastRowIds, setLastRowIds] = useState([]);
+
+  const handleSearchTextChanged = ({ target: { value } }) =>
+    setSearchTerm(value);
+
+  const handleNext = useCallback(() => {
+    const currentLastRowId = customers[customers.length - 1].id;
+    setLastRowIds([...lastRowIds, currentLastRowId]);
+  }, [customers, lastRowIds]);
+
+  //  pops the last value off the query string stack;
+  const handlePrevious = useCallback(() => {
+    setLastRowIds(lastRowIds.slice(0, -1));
+  }, [lastRowIds]);
 
   useEffect(() => {
     const fetchData = async () => {
-      let queryString = '';
-      if (queryStrings.length > 0)
-        queryString = queryStrings[queryStrings.length - 1];
+      let after;
+      if (lastRowIds.length > 0) after = lastRowIds[lastRowIds.length - 1];
+      const queryString = searchParams(after, searchTerm);
 
       const result = await window.fetch(`/customers${queryString}`, {
         method: 'GET',
@@ -40,22 +68,15 @@ export const CustomerSearch = () => {
     };
 
     fetchData();
-  }, [queryStrings]);
-
-  const handleNext = useCallback(() => {
-    const after = customers[customers.length - 1].id;
-    const queryString = `?after=${after}`;
-    setQueryStrings([...queryStrings, queryString]);
-  }, [customers, queryStrings]);
-
-  //  pops the last value off the query string stack;
-  const handlePrevious = useCallback(() => {
-    setQueryStrings(queryStrings.slice(0, -1));
-  }, [queryStrings]);
+  }, [lastRowIds, searchTerm]);
 
   return (
     <React.Fragment>
-      <input placeholder="Enter filter text" />
+      <input
+        placeholder="Enter filter text"
+        value={searchTerm}
+        onChange={handleSearchTextChanged}
+      />
       <SearchButtons handleNext={handleNext} handlePrevious={handlePrevious} />
       <table>
         <thead>

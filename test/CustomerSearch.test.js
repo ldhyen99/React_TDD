@@ -15,10 +15,17 @@ const twoCustomers = [
 ];
 
 describe('customer search', () => {
-  let renderAndWait, elements, clickAndWait, element;
+  let renderAndWait, elements, clickAndWait, element, changeAndWait, withEvent;
 
   beforeEach(() => {
-    ({ renderAndWait, elements, clickAndWait, element } = createContainer());
+    ({
+      renderAndWait,
+      elements,
+      clickAndWait,
+      element,
+      changeAndWait,
+      withEvent,
+    } = createContainer());
     jest.spyOn(window, 'fetch').mockReturnValue(fetchResponseOk(oneCustomer));
   });
 
@@ -104,7 +111,7 @@ describe('customer search', () => {
 
   const anotherTenCustomers = Array.from('ABCDEFGHIJ', (id) => ({ id }));
 
-  it('moves back one page when clicking previous after multiple clicks of the next button', async () => {
+  it('moves back one page when clicking previous searchTerm multiple clicks of the next button', async () => {
     window.fetch
       .mockReturnValueOnce(fetchResponseOk(tenCustomers))
       .mockReturnValue(fetchResponseOk(anotherTenCustomers));
@@ -138,6 +145,17 @@ describe('customer search', () => {
     expect(element('input')).not.toBeNull();
     expect(element('input').getAttribute('placeholder')).toEqual(
       'Enter filter text'
+    );
+  });
+
+  it('includes search term when moving to next page', async () => {
+    window.fetch.mockReturnValue(fetchResponseOk(tenCustomers));
+    await renderAndWait(<CustomerSearch />);
+    await changeAndWait(element('input'), withEvent('input', 'name'));
+    await clickAndWait(element('button#next-page'));
+    expect(window.fetch).toHaveBeenLastCalledWith(
+      '/customers?after=9&searchTerm=name',
+      expect.anything()
     );
   });
 });
