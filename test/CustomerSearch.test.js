@@ -158,4 +158,21 @@ describe('customer search', () => {
       expect.anything()
     );
   });
+
+  it.skip('displays provided action buttons for each customer', async () => {
+    const actionSpy = jest.fn();
+    actionSpy.mockReturnValue('actions');
+    window.fetch.mockReturnValue(fetchResponseOk(oneCustomer));
+    await renderAndWait(<CustomerSearch renderCustomerActions={actionSpy} />);
+    const rows = elements('table tbody td');
+    expect(rows[rows.length - 1].textContent).toEqual('actions');
+  });
+
+  it('passes customer to the renderCustomerActions prop', async () => {
+    const actionSpy = jest.fn();
+    actionSpy.mockReturnValue('actions');
+    window.fetch.mockReturnValue(fetchResponseOk(oneCustomer));
+    await renderAndWait(<CustomerSearch renderCustomerActions={actionSpy} />);
+    expect(actionSpy).toHaveBeenCalledWith(oneCustomer[0]);
+  });
 });
