@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 export const RouterButton = ({
   queryParams,
-  queryParams,
+  pathname,
   children,
   disabled,
 }) => {
