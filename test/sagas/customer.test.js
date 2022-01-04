@@ -1,10 +1,16 @@
 import { storeSpy, expectRedux } from 'expect-redux';
+import 'whatwg-fetch';
 import { configureStore } from '../../src/store';
 import { reducer } from '../../src/sagas/custome';
+import { fetchResponseOk, fetchResponseError } from '../spyHelps';
 
 describe('addCustomer', () => {
-  let store;
+  let store, fetchSpy;
+  const customer = { id: 123 };
+
   beforeEach(() => {
+    fetchSpy = jest.fn();
+    jest.spyOn(window, 'fetch').mockReturnValue(fetchResponseOk(customer));
     store = configureStore([storeSpy]);
   });
 
@@ -20,6 +26,43 @@ describe('addCustomer', () => {
     return expectRedux(store)
       .toDispatchAnAction()
       .matching({ type: 'ADD_CUSTOMER_SUBMITTING' });
+  });
+
+  it('submits request to the fetch api', async () => {
+    const inputCustomer = { firstName: 'Ashley' };
+    dispatchRequest(inputCustomer);
+
+    expect(window.fetch).toHaveBeenCalledWith('/customers', {
+      body: JSON.stringify(inputCustomer),
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+    });
+  });
+
+  it('dispatches ADD_CUSTOMER_SUCCESSFUL on success', () => {
+    dispatchRequest();
+    return expectRedux(store)
+      .toDispatchAnAction()
+      .matching({ type: 'ADD_CUSTOMER_SUCCESSFUL', customer });
+  });
+
+  it('dispatches ADD_CUSTOMER_FAILED on non-specific error', () => {
+    window.fetch.mockReturnValue(fetchResponseError());
+    dispatchRequest();
+    return expectRedux(store)
+      .toDispatchAnAction()
+      .matching({ type: 'ADD_CUSTOMER_FAILED' });
+  });
+
+  it('dispatches ADD_CUSTOMER_VALIDATION_FAILED if validation errors were returned', () => {
+    const errors = { field: 'field', description: 'error text' };
+    window.fetch.mockReturnValue(fetchResponseError(422, { errors }));
+    dispatchRequest();
+    return expectRedux(store).toDispatchAnAction().matching({
+      type: 'ADD_CUSTOMER_VALIDATION_FAILED',
+      validationErrors: errors,
+    });
   });
 });
 
