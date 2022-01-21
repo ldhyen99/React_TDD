@@ -1,5 +1,8 @@
 import ReactDOM from 'react-dom';
 import ReactTestUtils, { act } from 'react-dom/test-utils';
+import { Provider } from 'react-redux';
+import { storeSpy } from 'expect-redux';
+import { configureStore } from '../src/store';
 
 export const createContainer = () => {
   const container = document.createElement('div');
@@ -16,9 +19,7 @@ export const createContainer = () => {
     ReactTestUtils.Simulate[eventName](element, eventData);
 
   const simulateEventAndWait = (eventName) => async (element, eventData) =>
-    await act(async () =>
-      ReactTestUtils.Simulate[eventName](element, eventData)
-    );
+    act(async () => ReactTestUtils.Simulate[eventName](element, eventData));
 
   return {
     render: (component) =>
@@ -26,7 +27,7 @@ export const createContainer = () => {
         ReactDOM.render(component, container);
       }),
     renderAndWait: async (component) =>
-      await act(async () => ReactDOM.render(component, container)),
+      act(async () => ReactDOM.render(component, container)),
     container,
     form,
     field,
@@ -46,3 +47,21 @@ export const createContainer = () => {
 export const withEvent = (name, value) => ({
   target: { name, value },
 });
+
+export const createContainerWithStore = () => {
+  const store = configureStore([storeSpy]);
+
+  const container = createContainer();
+  return {
+    ...container,
+    store,
+    renderWithStore: (component) => {
+      act(() => {
+        ReactDOM.render(
+          <Provider store={store}>{component}</Provider>,
+          container.container
+        );
+      });
+    },
+  };
+};

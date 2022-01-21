@@ -1,7 +1,12 @@
 import React from 'react';
 import ReactTestUtils, { act } from 'react-dom/test-utils';
+import { expectRedux } from 'expect-redux';
 
-import { createContainer, withEvent } from './domManipulators';
+import {
+  createContainer,
+  withEvent,
+  createContainerWithStore,
+} from './domManipulators';
 import { CustomerForm } from '../src/CustomerForm';
 
 describe('customerForm', () => {
